@@ -3,9 +3,15 @@
 set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PREP_SCRIPT="$PROJECT_DIR/prepare_icon.py"
 
 if ! command -v sips >/dev/null 2>&1; then
   echo "Error: sips is not available on this system."
+  exit 1
+fi
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "Error: python3 is required."
   exit 1
 fi
 
@@ -40,22 +46,13 @@ create_icon() {
   echo "Created $out_name (${size}x${size})"
 }
 
-WIDTH="$(sips -g pixelWidth "$SOURCE_PATH" | awk '/pixelWidth/{print $2}')"
-HEIGHT="$(sips -g pixelHeight "$SOURCE_PATH" | awk '/pixelHeight/{print $2}')"
-
-if [ -z "$WIDTH" ] || [ -z "$HEIGHT" ]; then
-  echo "Error: could not read source image dimensions."
+if [ ! -f "$PREP_SCRIPT" ]; then
+  echo "Error: missing helper script: $PREP_SCRIPT"
   exit 1
 fi
 
-if [ "$WIDTH" -lt "$HEIGHT" ]; then
-  SIDE="$WIDTH"
-else
-  SIDE="$HEIGHT"
-fi
-
 TMP_SQUARE="$PROJECT_DIR/.icon-square-tmp.png"
-sips -c "$SIDE" "$SIDE" "$SOURCE_PATH" --out "$TMP_SQUARE" >/dev/null
+python3 "$PREP_SCRIPT" "$SOURCE_PATH" "$TMP_SQUARE"
 
 SOURCE_PATH="$TMP_SQUARE"
 create_icon 180 "apple-touch-icon.png"
