@@ -40,9 +40,29 @@ create_icon() {
   echo "Created $out_name (${size}x${size})"
 }
 
+WIDTH="$(sips -g pixelWidth "$SOURCE_PATH" | awk '/pixelWidth/{print $2}')"
+HEIGHT="$(sips -g pixelHeight "$SOURCE_PATH" | awk '/pixelHeight/{print $2}')"
+
+if [ -z "$WIDTH" ] || [ -z "$HEIGHT" ]; then
+  echo "Error: could not read source image dimensions."
+  exit 1
+fi
+
+if [ "$WIDTH" -lt "$HEIGHT" ]; then
+  SIDE="$WIDTH"
+else
+  SIDE="$HEIGHT"
+fi
+
+TMP_SQUARE="$PROJECT_DIR/.icon-square-tmp.png"
+sips -c "$SIDE" "$SIDE" "$SOURCE_PATH" --out "$TMP_SQUARE" >/dev/null
+
+SOURCE_PATH="$TMP_SQUARE"
 create_icon 180 "apple-touch-icon.png"
 create_icon 192 "icon-192.png"
 create_icon 512 "icon-512.png"
+
+rm -f "$TMP_SQUARE"
 
 echo "Done. Icons were written to:"
 echo "  $PROJECT_DIR/apple-touch-icon.png"
