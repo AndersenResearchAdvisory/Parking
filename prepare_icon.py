@@ -144,7 +144,14 @@ def crop_rows(rows, min_x, min_y, max_x, max_y):
     return out
 
 
-def center_on_square(rows, content_w: int, content_h: int, margin_ratio: float):
+def parse_hex_color(hex_color: str):
+    v = hex_color.strip().lstrip("#")
+    if len(v) != 6:
+        raise ValueError("Background color must be RRGGBB.")
+    return int(v[0:2], 16), int(v[2:4], 16), int(v[4:6], 16)
+
+
+def center_on_square(rows, content_w: int, content_h: int, margin_ratio: float, bg_rgb):
     scale_area = max(0.1, min(0.95, 1.0 - (2 * margin_ratio)))
     side = max(content_w, content_h)
     canvas = int(math.ceil(side / scale_area))
@@ -153,13 +160,32 @@ def center_on_square(rows, content_w: int, content_h: int, margin_ratio: float):
     x_off = (canvas - content_w) // 2
     y_off = (canvas - content_h) // 2
 
-    out = [bytearray(canvas * 4) for _ in range(canvas)]
+    r, g, b = bg_rgb
+    out = []
+    for _ in range(canvas):
+        row = bytearray(canvas * 4)
+        for x in range(canvas):
+            i = x * 4
+            row[i] = r
+            row[i + 1] = g
+            row[i + 2] = b
+            row[i + 3] = 255
+        out.append(row)
 
     for y in range(content_h):
         src = rows[y]
         dst = out[y + y_off]
         start = x_off * 4
-        dst[start : start + len(src)] = src
+        for i in range(0, len(src), 4):
+            a = src[i + 3]
+            if a == 0:
+                continue
+            alpha = a / 255.0
+            di = start + i
+            dst[di] = int((src[i] * alpha) + (dst[di] * (1.0 - alpha)))
+            dst[di + 1] = int((src[i + 1] * alpha) + (dst[di + 1] * (1.0 - alpha)))
+            dst[di + 2] = int((src[i + 2] * alpha) + (dst[di + 2] * (1.0 - alpha)))
+            dst[di + 3] = 255
 
     return canvas, canvas, out
 
@@ -188,20 +214,22 @@ def write_png_rgba(path: Path, width: int, height: int, rows):
 
 
 def main():
-    if len(sys.argv) not in (3, 4):
-        print("Usage: prepare_icon.py <input.png> <output.png> [margin_ratio]")
+    if len(sys.argv) not in (3, 4, 5):
+        print("Usage: prepare_icon.py <input.png> <output.png> [margin_ratio] [bg_hex]")
         sys.exit(1)
 
     src = Path(sys.argv[1])
     dst = Path(sys.argv[2])
-    margin = float(sys.argv[3]) if len(sys.argv) == 4 else 0.14
+    margin = float(sys.argv[3]) if len(sys.argv) >= 4 else 0.14
+    bg_hex = sys.argv[4] if len(sys.argv) == 5 else "F5E7C9"
+    bg_rgb = parse_hex_color(bg_hex)
 
     w, h, rows = read_png_rgba(src)
     min_x, min_y, max_x, max_y = find_alpha_bounds(w, h, rows)
     cropped = crop_rows(rows, min_x, min_y, max_x, max_y)
     cw = max_x - min_x + 1
     ch = max_y - min_y + 1
-    out_w, out_h, centered = center_on_square(cropped, cw, ch, margin)
+    out_w, out_h, centered = center_on_square(cropped, cw, ch, margin, bg_rgb)
     write_png_rgba(dst, out_w, out_h, centered)
     print(f"Prepared icon: {dst} ({out_w}x{out_h})")
 
