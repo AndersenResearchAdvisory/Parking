@@ -1,37 +1,86 @@
-<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Lag_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 1024 1024">
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
   <defs>
-    <linearGradient id="bg" x1="120" y1="90" x2="920" y2="940" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#F5E7C9"/>
-      <stop offset="1" stop-color="#E4CFA2"/>
+    <style>
+      .st0 {
+        fill: url(#Ikke-navngivet_forløb);
+      }
+
+      .st1 {
+        fill: #1e8e4d;
+      }
+
+      .st2, .st3 {
+        stroke: #d28d17;
+      }
+
+      .st2, .st3, .st4 {
+        stroke-width: 34px;
+      }
+
+      .st2, .st3, .st4, .st5, .st6 {
+        fill: none;
+        stroke-linecap: round;
+      }
+
+      .st2, .st5 {
+        stroke-linejoin: round;
+      }
+
+      .st4 {
+        stroke: #cfb688;
+      }
+
+      .st5 {
+        stroke: #fff;
+        stroke-width: 16px;
+      }
+
+      .st6 {
+        stroke: #d8c29a;
+        stroke-width: 24px;
+      }
+
+      .st7 {
+        fill: url(#Ikke-navngivet_forløb_3);
+      }
+
+      .st8 {
+        fill: url(#Ikke-navngivet_forløb_2);
+      }
+
+      .st9 {
+        filter: url(#shadow);
+      }
+    </style>
+    <linearGradient id="Ikke-navngivet_forløb" data-name="Ikke-navngivet forløb" x1="117.26" y1="933.42" x2="917.26" y2="83.42" gradientTransform="translate(0 1026) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f5e7c9"/>
+      <stop offset="1" stop-color="#e4cfa2"/>
     </linearGradient>
-    <linearGradient id="pin" x1="420" y1="260" x2="620" y2="640" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#137765"/>
-      <stop offset="1" stop-color="#0C5B4D"/>
-    </linearGradient>
-    <linearGradient id="badge" x1="370" y1="330" x2="650" y2="630" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#FFFFFF"/>
-      <stop offset="1" stop-color="#F6F1E5"/>
-    </linearGradient>
-    <filter id="shadow" x="200" y="180" width="624" height="690" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+    <filter id="shadow" x="200" y="180" width="624" height="690">
       <feOffset dy="18"/>
       <feGaussianBlur stdDeviation="18"/>
-      <feColorMatrix type="matrix" values="0 0 0 0 0.17 0 0 0 0 0.12 0 0 0 0 0.06 0 0 0 0.28 0"/>
+      <feColorMatrix values="0 0 0 0 0.17 0 0 0 0 0.12 0 0 0 0 0.06 0 0 0 0.28 0"/>
     </filter>
+    <linearGradient id="Ikke-navngivet_forløb_2" data-name="Ikke-navngivet forløb 2" x1="413.11" y1="762.38" x2="613.11" y2="382.38" gradientTransform="translate(0 1026) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#137765"/>
+      <stop offset="1" stop-color="#0c5b4d"/>
+    </linearGradient>
+    <linearGradient id="Ikke-navngivet_forløb_3" data-name="Ikke-navngivet forløb 3" x1="388.53" y1="713.29" x2="668.53" y2="413.29" gradientTransform="translate(0 1026) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="1" stop-color="#f6f1e5"/>
+    </linearGradient>
   </defs>
-
-  <rect x="32" y="32" width="960" height="960" rx="220" fill="url(#bg)"/>
-
-  <path d="M210 790C330 900 694 900 814 790" stroke="#CFB688" stroke-width="34" stroke-linecap="round"/>
-  <path d="M250 858C368 940 656 940 774 858" stroke="#D8C29A" stroke-width="24" stroke-linecap="round"/>
-
-  <g filter="url(#shadow)">
-    <path d="M512 246C400 246 309 335 309 446C309 590 464 729 499 760C507 767 517 767 525 760C560 729 715 590 715 446C715 335 624 246 512 246Z" fill="url(#pin)"/>
+  <rect class="st0" x="32" y="32" width="960" height="960" rx="220" ry="220"/>
+  <path class="st4" d="M210,790c120,110,484,110,604,0"/>
+  <path class="st6" d="M250,858c118,82,406,82,524,0"/>
+  <g class="st9">
+    <path class="st8" d="M512,246c-112,0-203,89-203,200,0,144,155,283,190,314,8,7,18,7,26,0,35-31,190-170,190-314,0-111-91-200-203-200Z"/>
   </g>
-
-  <circle cx="512" cy="445" r="126" fill="url(#badge)"/>
-  <path d="M454 366V524" stroke="#D28D17" stroke-width="34" stroke-linecap="round"/>
-  <path d="M454 366H533C573 366 605 398 605 438C605 478 573 510 533 510H454" stroke="#D28D17" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-
-  <circle cx="786" cy="246" r="64" fill="#1E8E4D"/>
-  <path d="M758 246L780 268L818 228" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle class="st7" cx="512" cy="445" r="126"/>
+  <path class="st3" d="M454,366v158"/>
+  <path class="st2" d="M454,366h79c40,0,72,32,72,72s-32,72-72,72h-79"/>
+  <circle class="st1" cx="786" cy="246" r="64"/>
+  <path class="st5" d="M758,246l22,22,38-40"/>
 </svg>
