@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Where Did I Park?</title>
+  <style>
+    :root {
+      --bg: #f7f4ef;
+      --card: #fffdf9;
+      --text: #2b2620;
+      --muted: #6a6257;
+      --accent: #0d6b5b;
+      --accent-2: #d17d00;
+      --border: #ddd5c9;
+      --ok: #1f8f4e;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 10% 10%, #efe8dc 0%, transparent 45%),
+        radial-gradient(circle at 90% 90%, #f3e9d4 0%, transparent 42%),
+        var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: min(560px, 100%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 10px 24px rgba(45, 39, 32, 0.08);
+      padding: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.4rem, 3vw, 1.9rem);
+    }
+
+    .sub {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .status-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .status-pill {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      font-weight: 700;
+      color: var(--muted);
+      background: #f6f1e8;
+    }
+
+    .status-pill.active {
+      background: #e7f6ec;
+      color: var(--ok);
+      border-color: #a8d9b8;
+    }
+
+    .section {
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .level-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .level-btn,
+    .main-btn,
+    .clear-btn {
+      border-radius: 10px;
+      padding: 11px 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .level-btn {
+      border: 1px solid var(--border);
+      background: #f5f0e7;
+      color: var(--text);
+    }
+
+    .level-btn.active {
+      background: var(--accent-2);
+      border-color: var(--accent-2);
+      color: #fff;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .main-btn {
+      border: 0;
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .clear-btn {
+      border: 1px solid #dcb7b5;
+      background: #f7e4e2;
+      color: #8f2a25;
+    }
+
+    .gps-status {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .result {
+      margin-top: 10px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fffcf5;
+    }
+
+    .result h2 {
+      margin: 0 0 8px;
+      font-size: 1.02rem;
+    }
+
+    .map-links {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .map-link {
+      text-align: center;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 9px 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #18473f;
+      background: #edf7f3;
+    }
+
+    .map-link.disabled {
+      pointer-events: none;
+      opacity: 0.5;
+      background: #f2f0ea;
+      color: var(--muted);
+    }
+
+    .empty {
+      color: var(--muted);
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>Where Did I Park?</h1>
+    <p class="sub">Tap a level for parking lot (GPS auto-captured), or tap GPS for street.</p>
+
+    <div class="status-row" aria-label="Parking type status">
+      <div id="lotStatus" class="status-pill">Parking Lot</div>
+      <div id="streetStatus" class="status-pill">Street</div>
+    </div>
+
+    <section class="section">
+      <span class="section-title">Parking lot level</span>
+      <div class="level-buttons" role="group" aria-label="Select parking level">
+        <button class="level-btn" type="button" data-level="Level 1">Level 1</button>
+        <button class="level-btn" type="button" data-level="Level 2">Level 2</button>
+        <button class="level-btn" type="button" data-level="Level 3">Level 3</button>
+        <button class="level-btn" type="button" data-level="Level 4">Level 4</button>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button id="captureGpsBtn" class="main-btn" type="button">Save Street via GPS</button>
+      <button id="clearBtn" class="clear-btn" type="button">Clear</button>
+    </div>
+
+    <p id="gpsStatus" class="gps-status">No GPS captured yet.</p>
+
+    <section class="result" aria-live="polite">
+      <h2>Last saved spot</h2>
+      <div id="lastSpot" class="empty">No parking spot saved yet.</div>
+      <div class="map-links">
+        <a id="openMapLink" class="map-link disabled" href="#" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
+        <a id="navMapLink" class="map-link disabled" href="#" target="_blank" rel="noopener noreferrer">Start Navigation</a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "simpleParkingSpot";
+
+    const lotStatus = document.getElementById("lotStatus");
+    const streetStatus = document.getElementById("streetStatus");
+    const levelButtons = document.querySelectorAll(".level-btn");
+    const captureGpsBtn = document.getElementById("captureGpsBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const gpsStatus = document.getElementById("gpsStatus");
+    const lastSpot = document.getElementById("lastSpot");
+    const openMapLink = document.getElementById("openMapLink");
+    const navMapLink = document.getElementById("navMapLink");
+
+    function setMapLinks(gps) {
+      if (!gps) {
+        openMapLink.href = "#";
+        navMapLink.href = "#";
+        openMapLink.classList.add("disabled");
+        navMapLink.classList.add("disabled");
+        return;
+      }
+
+      const latLng = `${gps.lat},${gps.lng}`;
+      openMapLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(latLng)}`;
+      navMapLink.href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(latLng)}&travelmode=driving`;
+      openMapLink.classList.remove("disabled");
+      navMapLink.classList.remove("disabled");
+    }
+
+    function setTypeStatus(type) {
+      lotStatus.classList.toggle("active", type === "lot");
+      streetStatus.classList.toggle("active", type === "street");
+    }
+
+    function setSelectedLevel(level) {
+      levelButtons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.level === level);
+      });
+    }
+
+    function renderSavedSpot() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        setTypeStatus(null);
+        setSelectedLevel("");
+        gpsStatus.textContent = "No GPS captured yet.";
+        setMapLinks(null);
+        lastSpot.className = "empty";
+        lastSpot.textContent = "No parking spot saved yet.";
+        return;
+      }
+
+      try {
+        const data = JSON.parse(raw);
+        const when = new Date(data.savedAt).toLocaleString();
+        const gpsText = `${data.gps.lat.toFixed(6)}, ${data.gps.lng.toFixed(6)} (±${Math.round(data.gps.accuracy)}m)`;
+
+        setTypeStatus(data.type);
+        setSelectedLevel(data.type === "lot" ? data.level : "");
+        gpsStatus.textContent = `GPS: ${gpsText}`;
+        setMapLinks(data.gps);
+
+        lastSpot.className = "";
+        if (data.type === "lot") {
+          lastSpot.innerHTML = `<p><strong>Type:</strong> Parking Lot</p><p><strong>Level:</strong> ${data.level}</p><p><strong>GPS:</strong> ${gpsText}</p><p><strong>Saved:</strong> ${when}</p>`;
+        } else {
+          lastSpot.innerHTML = `<p><strong>Type:</strong> Street</p><p><strong>GPS:</strong> ${gpsText}</p><p><strong>Saved:</strong> ${when}</p>`;
+        }
+      } catch (_) {
+        setTypeStatus(null);
+        setSelectedLevel("");
+        setMapLinks(null);
+        gpsStatus.textContent = "Saved data is invalid. Please save again.";
+        lastSpot.className = "empty";
+        lastSpot.textContent = "Saved data is invalid. Please save again.";
+      }
+    }
+
+    function captureGps() {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error("GPS is not supported on this device/browser."));
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            resolve({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              accuracy: position.coords.accuracy,
+              capturedAt: new Date().toISOString()
+            });
+          },
+          (error) => reject(new Error(error.message)),
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      });
+    }
+
+    async function saveLot(level) {
+      gpsStatus.textContent = "Capturing GPS for parking lot...";
+      try {
+        const gps = await captureGps();
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            type: "lot",
+            level,
+            gps,
+            savedAt: new Date().toISOString()
+          })
+        );
+        renderSavedSpot();
+      } catch (error) {
+        gpsStatus.textContent = `GPS failed: ${error.message}`;
+      }
+    }
+
+    async function saveStreet() {
+      gpsStatus.textContent = "Capturing GPS for street...";
+      try {
+        const gps = await captureGps();
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            type: "street",
+            gps,
+            savedAt: new Date().toISOString()
+          })
+        );
+        renderSavedSpot();
+      } catch (error) {
+        gpsStatus.textContent = `GPS failed: ${error.message}`;
+      }
+    }
+
+    levelButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        saveLot(btn.dataset.level);
+      });
+    });
+
+    captureGpsBtn.addEventListener("click", saveStreet);
+
+    clearBtn.addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      renderSavedSpot();
+    });
+
+    renderSavedSpot();
+  </script>
+</body>
+</html>
