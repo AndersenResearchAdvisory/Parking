@@ -2,19 +2,19 @@
   "name": "Where Did I Park",
   "short_name": "Where I Park",
   "id": "./",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#E4CFA2",
   "theme_color": "#E4CFA2",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icon-192-v4.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "icon-512-v4.png",
       "sizes": "512x512",
       "type": "image/png"
     }
