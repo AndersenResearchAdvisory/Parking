@@ -80,12 +80,18 @@
       font-weight: 700;
       color: var(--muted);
       background: #f6f1e8;
+      cursor: pointer;
     }
 
     .status-pill.active {
       background: #e7f6ec;
       color: var(--ok);
       border-color: #a8d9b8;
+    }
+
+    .status-pill:focus-visible {
+      outline: 3px solid rgba(13, 107, 91, 0.22);
+      outline-offset: 2px;
     }
 
     .section {
@@ -138,6 +144,11 @@
       border: 0;
       background: var(--accent);
       color: #fff;
+    }
+
+    .main-btn.active-state {
+      background: var(--accent-2);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
     }
 
     .clear-btn {
@@ -358,8 +369,8 @@
     <p class="sub">Share the same car link with other people, then save lot or street parking together.</p>
 
     <div class="status-row" aria-label="Parking type status">
-      <div id="lotStatus" class="status-pill">Parking Lot</div>
-      <div id="streetStatus" class="status-pill">Street</div>
+      <div id="lotStatus" class="status-pill" role="button" tabindex="0" aria-label="Save parking lot location">Parking Lot</div>
+      <div id="streetStatus" class="status-pill" role="button" tabindex="0" aria-label="Save street location">Street</div>
     </div>
 
     <section class="section">
@@ -426,6 +437,12 @@
   <script>
     const MAX_HISTORY_ITEMS = 20;
     const SYNC_INTERVAL_MS = 15000;
+    const FIXED_PARKING_LOT_GPS = {
+      lat: 55.684390235670506,
+      lng: 12.555727815087112,
+      accuracy: 5,
+      capturedAt: null
+    };
     const BACKEND_CONFIG = {
       supabaseUrl: "https://uhzribfomeeljalpsmel.supabase.co",
       supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVoenJpYmZvbWVlbGphbHBzbWVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1OTM3MjgsImV4cCI6MjA4OTE2OTcyOH0.mA28_X-BF1Pj598aJ2vPy8E77EoIaClyYiT6C1cCwOs"
@@ -533,6 +550,11 @@
     function setTypeStatus(type) {
       lotStatus.classList.toggle("active", type === "lot");
       streetStatus.classList.toggle("active", type === "street");
+    }
+
+    function setStreetButtonState(isSaved) {
+      captureGpsBtn.textContent = isSaved ? "Street Address Saved" : "Save Street via GPS";
+      captureGpsBtn.classList.toggle("active-state", isSaved);
     }
 
     function setSelectedLevel(level) {
@@ -777,6 +799,7 @@
       if (!current) {
         setTypeStatus(null);
         setSelectedLevel("");
+        setStreetButtonState(false);
         gpsStatus.textContent = hasBackendConfig() ? "No shared GPS saved yet." : "Shared backend is not configured.";
         distanceStatus.textContent = "Distance to car unavailable.";
         zoneInput.value = "";
@@ -795,6 +818,7 @@
 
       setTypeStatus(current.type);
       setSelectedLevel(current.type === "lot" ? current.level : "");
+      setStreetButtonState(current.type === "street");
       gpsStatus.textContent = `Shared GPS: ${gpsText}`;
       distanceStatus.textContent = "Tap Locate My Car to get your current distance.";
       zoneInput.value = details.zone || "";
@@ -907,6 +931,20 @@
       }
     }
 
+    async function saveFixedParkingLot() {
+      gpsStatus.textContent = "Saving fixed parking lot location...";
+      await saveSpot({
+        type: "lot",
+        level: Array.from(levelButtons).find((btn) => btn.classList.contains("active"))?.dataset.level || "Parking Lot",
+        details: getSpotDetails(),
+        gps: {
+          ...FIXED_PARKING_LOT_GPS,
+          capturedAt: new Date().toISOString()
+        },
+        savedAt: new Date().toISOString()
+      });
+    }
+
     async function saveStreet() {
       gpsStatus.textContent = "Capturing GPS for street...";
       try {
@@ -989,7 +1027,19 @@
       });
     });
 
+    function addStatusTrigger(element, handler) {
+      element.addEventListener("click", handler);
+      element.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handler();
+        }
+      });
+    }
+
     captureGpsBtn.addEventListener("click", saveStreet);
+    addStatusTrigger(lotStatus, saveFixedParkingLot);
+    addStatusTrigger(streetStatus, saveStreet);
     locateBtn.addEventListener("click", locateCar);
     clearBtn.addEventListener("click", clearSharedCar);
     openCarBtn.addEventListener("click", openCar);
