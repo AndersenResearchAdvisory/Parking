@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#E4CFA2">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Where I Park">
+  <meta name="apple-mobile-web-app-title" content="Car Locator">
   <link rel="apple-touch-icon" sizes="180x180" href="/Parking/apple-touch-icon-v5.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-v5.png">
   <link rel="icon" type="image/png" sizes="192x192" href="/Parking/icon-192-v5.png">
@@ -14,7 +14,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="/Parking/icon-512-v5.png">
   <link rel="icon" type="image/png" sizes="512x512" href="icon-512-v5.png">
   <link rel="manifest" href="site.webmanifest?v=5">
-  <title>Where Did I Park?</title>
+  <title>Car Locator</title>
   <style>
     :root {
       --bg: #f7f4ef;
@@ -129,7 +129,7 @@
 
     .actions {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr 1fr auto;
       gap: 10px;
       margin-bottom: 10px;
     }
@@ -147,6 +147,78 @@
     }
 
     .gps-status {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .share-card {
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: linear-gradient(180deg, #fffaf1 0%, #f9f4ea 100%);
+    }
+
+    .share-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .share-grid {
+      grid-template-columns: 1fr auto auto;
+      align-items: end;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .field-input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+      color: var(--text);
+      font-size: 0.92rem;
+    }
+
+    .secondary-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+    }
+
+    .share-note,
+    .sync-status {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .spot-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .spot-input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+      color: var(--text);
+      font-size: 0.92rem;
+    }
+
+    .distance {
       margin: 0 0 14px;
       color: var(--muted);
       font-size: 0.9rem;
@@ -195,12 +267,108 @@
       color: var(--muted);
       font-style: italic;
     }
+
+    .mini-map-wrap {
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #f2f0ea;
+    }
+
+    .mini-map {
+      width: 100%;
+      height: 180px;
+      border: 0;
+      display: block;
+      background: #e7e2d9;
+    }
+
+    .mini-map-note {
+      margin: 0;
+      padding: 8px 10px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      background: #faf7f1;
+      border-top: 1px solid var(--border);
+    }
+
+    .history {
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .history h2 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .history-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 10px;
+      background: #fcfaf5;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .history-meta {
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .history-btn {
+      border: 1px solid var(--border);
+      background: #edf7f3;
+      color: #18473f;
+      border-radius: 8px;
+      padding: 7px 9px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 560px) {
+      .share-grid,
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .spot-inputs {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
   <main class="app">
-    <h1>Where Did I Park?</h1>
-    <p class="sub">Tap a level for parking lot (GPS auto-captured), or tap GPS for street.</p>
+    <h1>Car Locator</h1>
+    <p class="sub">Share the same car link with other people, then save lot or street parking together.</p>
+
+    <section class="share-card">
+      <div class="share-grid">
+        <div>
+          <label class="field-label" for="carIdInput">Shared car ID</label>
+          <input id="carIdInput" class="field-input" type="text" maxlength="48" placeholder="shared car id">
+        </div>
+        <button id="openCarBtn" class="main-btn secondary-btn" type="button">Open Car</button>
+        <button id="copyShareBtn" class="main-btn secondary-btn" type="button">Copy Link</button>
+      </div>
+      <p id="shareNote" class="share-note">This link identifies the shared car.</p>
+      <p id="syncStatus" class="sync-status">Shared backend is ready.</p>
+    </section>
 
     <div class="status-row" aria-label="Parking type status">
       <div id="lotStatus" class="status-pill">Parking Lot</div>
@@ -217,12 +385,22 @@
       </div>
     </section>
 
+    <section class="section">
+      <span class="section-title">Optional details</span>
+      <div class="spot-inputs">
+        <input id="zoneInput" class="spot-input" type="text" maxlength="40" placeholder="Zone or section (ex: B2)">
+        <input id="spotInput" class="spot-input" type="text" maxlength="40" placeholder="Spot or note (ex: Near elevator)">
+      </div>
+    </section>
+
     <div class="actions">
       <button id="captureGpsBtn" class="main-btn" type="button">Save Street via GPS</button>
+      <button id="locateBtn" class="main-btn" type="button">Locate My Car</button>
       <button id="clearBtn" class="clear-btn" type="button">Clear</button>
     </div>
 
     <p id="gpsStatus" class="gps-status">No GPS captured yet.</p>
+    <p id="distanceStatus" class="distance">Distance to car unavailable.</p>
 
     <section class="result" aria-live="polite">
       <h2>Last saved spot</h2>
@@ -231,24 +409,146 @@
         <a id="openMapLink" class="map-link disabled" href="#" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
         <a id="navMapLink" class="map-link disabled" href="#" target="_blank" rel="noopener noreferrer">Start Navigation</a>
       </div>
+      <div class="mini-map-wrap">
+        <iframe id="miniMapFrame" class="mini-map" title="Saved car mini map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <p id="miniMapNote" class="mini-map-note">Mini-map will appear after saving a location.</p>
+      </div>
+    </section>
+
+    <section class="history" aria-live="polite">
+      <h2>Previous parking locations</h2>
+      <div id="historyList" class="history-list">
+        <p class="empty">No previous locations yet.</p>
+      </div>
     </section>
   </main>
 
   <script>
-    const STORAGE_KEY = "simpleParkingSpot";
+    const MAX_HISTORY_ITEMS = 20;
+    const SYNC_INTERVAL_MS = 15000;
+    const BACKEND_CONFIG = {
+      supabaseUrl: "https://uhzribfomeeljalpsmel.supabase.co",
+      supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVoenJpYmZvbWVlbGphbHBzbWVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1OTM3MjgsImV4cCI6MjA4OTE2OTcyOH0.mA28_X-BF1Pj598aJ2vPy8E77EoIaClyYiT6C1cCwOs"
+    };
 
     const lotStatus = document.getElementById("lotStatus");
     const streetStatus = document.getElementById("streetStatus");
     const levelButtons = document.querySelectorAll(".level-btn");
     const captureGpsBtn = document.getElementById("captureGpsBtn");
+    const locateBtn = document.getElementById("locateBtn");
     const clearBtn = document.getElementById("clearBtn");
     const gpsStatus = document.getElementById("gpsStatus");
+    const distanceStatus = document.getElementById("distanceStatus");
+    const zoneInput = document.getElementById("zoneInput");
+    const spotInput = document.getElementById("spotInput");
     const lastSpot = document.getElementById("lastSpot");
     const openMapLink = document.getElementById("openMapLink");
     const navMapLink = document.getElementById("navMapLink");
+    const miniMapFrame = document.getElementById("miniMapFrame");
+    const miniMapNote = document.getElementById("miniMapNote");
+    const historyList = document.getElementById("historyList");
+    const carIdInput = document.getElementById("carIdInput");
+    const openCarBtn = document.getElementById("openCarBtn");
+    const copyShareBtn = document.getElementById("copyShareBtn");
+    const shareNote = document.getElementById("shareNote");
+    const syncStatus = document.getElementById("syncStatus");
+
+    let appState = {
+      current: null,
+      history: [],
+      config: null,
+      isSyncing: false
+    };
+
+    function isValidGps(gps) {
+      return Boolean(gps && typeof gps.lat === "number" && typeof gps.lng === "number");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function formatSavedDate(isoValue) {
+      const parsed = new Date(isoValue);
+      if (Number.isNaN(parsed.getTime())) {
+        return "Unknown time";
+      }
+      return parsed.toLocaleString();
+    }
+
+    function toRadians(value) {
+      return (value * Math.PI) / 180;
+    }
+
+    function calculateDistanceMeters(from, to) {
+      const earthRadiusMeters = 6371000;
+      const dLat = toRadians(to.lat - from.lat);
+      const dLng = toRadians(to.lng - from.lng);
+      const lat1 = toRadians(from.lat);
+      const lat2 = toRadians(to.lat);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return earthRadiusMeters * c;
+    }
+
+    function formatDistance(meters) {
+      if (meters < 1000) {
+        return `${Math.round(meters)} m`;
+      }
+      return `${(meters / 1000).toFixed(2)} km`;
+    }
+
+    function getSpotDetails() {
+      return {
+        zone: zoneInput.value.trim(),
+        note: spotInput.value.trim()
+      };
+    }
+
+    function describeSpotDetails(details) {
+      const parts = [];
+      if (details.zone) {
+        parts.push(`<p><strong>Zone:</strong> ${escapeHtml(details.zone)}</p>`);
+      }
+      if (details.note) {
+        parts.push(`<p><strong>Note:</strong> ${escapeHtml(details.note)}</p>`);
+      }
+      return parts.join("");
+    }
+
+    function formatHistoryTitle(spot) {
+      if (spot.type === "lot") {
+        return `Parking lot${spot.level ? ` - ${spot.level}` : ""}`;
+      }
+      return "Street parking";
+    }
+
+    function setTypeStatus(type) {
+      lotStatus.classList.toggle("active", type === "lot");
+      streetStatus.classList.toggle("active", type === "street");
+    }
+
+    function setSelectedLevel(level) {
+      levelButtons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.level === level);
+      });
+    }
+
+    function setLocateEnabled(enabled) {
+      locateBtn.disabled = !enabled;
+      locateBtn.style.opacity = enabled ? "1" : "0.55";
+      locateBtn.style.cursor = enabled ? "pointer" : "not-allowed";
+    }
 
     function setMapLinks(gps) {
-      if (!gps) {
+      if (!isValidGps(gps)) {
         openMapLink.href = "#";
         navMapLink.href = "#";
         openMapLink.classList.add("disabled");
@@ -263,56 +563,290 @@
       navMapLink.classList.remove("disabled");
     }
 
-    function setTypeStatus(type) {
-      lotStatus.classList.toggle("active", type === "lot");
-      streetStatus.classList.toggle("active", type === "street");
+    function setMiniMap(gps) {
+      if (!isValidGps(gps)) {
+        miniMapFrame.removeAttribute("src");
+        miniMapNote.textContent = "Mini-map will appear after saving a location.";
+        return;
+      }
+      const delta = 0.0022;
+      const bbox = `${gps.lng - delta},${gps.lat - delta},${gps.lng + delta},${gps.lat + delta}`;
+      const marker = `${gps.lat},${gps.lng}`;
+      miniMapFrame.src = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(marker)}`;
+      miniMapNote.textContent = "Marker shows the shared car location.";
     }
 
-    function setSelectedLevel(level) {
-      levelButtons.forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.level === level);
+    function normalizeSpot(spot) {
+      if (!spot || !isValidGps(spot.gps)) {
+        return null;
+      }
+      return {
+        type: spot.type === "lot" ? "lot" : "street",
+        level: typeof spot.level === "string" ? spot.level : "",
+        details: {
+          zone: spot.details?.zone || "",
+          note: spot.details?.note || ""
+        },
+        gps: {
+          lat: Number(spot.gps.lat),
+          lng: Number(spot.gps.lng),
+          accuracy: Number(spot.gps.accuracy || 0),
+          capturedAt: spot.gps.capturedAt || null
+        },
+        savedAt: spot.savedAt || new Date().toISOString()
+      };
+    }
+
+    function normalizeHistoryRows(rows) {
+      if (!Array.isArray(rows)) {
+        return [];
+      }
+      return rows
+        .map((row) => normalizeSpot({ ...(row.spot || {}), savedAt: row.saved_at || row.spot?.savedAt }))
+        .filter(Boolean);
+    }
+
+    function hasBackendConfig() {
+      return Boolean(appState.config?.supabaseUrl && appState.config?.supabaseAnonKey);
+    }
+
+    function generateCarId() {
+      return `car-${Math.random().toString(36).slice(2, 10)}`;
+    }
+
+    function getCarId() {
+      const params = new URLSearchParams(window.location.search);
+      return (params.get("car") || "").trim();
+    }
+
+    function setCarId(carId) {
+      const params = new URLSearchParams(window.location.search);
+      params.set("car", carId);
+      const nextUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState({}, "", nextUrl);
+      carIdInput.value = carId;
+      shareNote.textContent = `Share this link for car ${carId}.`;
+    }
+
+    function ensureCarId() {
+      let carId = getCarId();
+      if (!carId) {
+        carId = generateCarId();
+        setCarId(carId);
+      } else {
+        carIdInput.value = carId;
+        shareNote.textContent = `Share this link for car ${carId}.`;
+      }
+      return carId;
+    }
+
+    async function copyShareLink() {
+      const shareUrl = window.location.href;
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        shareNote.textContent = "Share link copied.";
+      } catch (_) {
+        shareNote.textContent = shareUrl;
+      }
+    }
+
+    async function apiRequest(path, options = {}) {
+      if (!hasBackendConfig()) {
+        throw new Error("Shared backend is not configured.");
+      }
+
+      const url = `${appState.config.supabaseUrl}/rest/v1/${path}`;
+      const headers = {
+        apikey: appState.config.supabaseAnonKey,
+        Authorization: `Bearer ${appState.config.supabaseAnonKey}`,
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      };
+      const response = await fetch(url, { ...options, headers });
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || `Request failed with ${response.status}`);
+      }
+      if (response.status === 204) {
+        return null;
+      }
+      return response.json();
+    }
+
+    async function fetchRemoteState() {
+      const carId = getCarId();
+      const encodedCarId = encodeURIComponent(carId);
+      const [cars, historyRows] = await Promise.all([
+        apiRequest(`cars?id=eq.${encodedCarId}&select=id,current_spot,updated_at`),
+        apiRequest(`parking_history?car_id=eq.${encodedCarId}&select=id,spot,saved_at&order=saved_at.desc&limit=${MAX_HISTORY_ITEMS}`)
+      ]);
+
+      return {
+        current: normalizeSpot(cars?.[0]?.current_spot),
+        history: normalizeHistoryRows(historyRows)
+      };
+    }
+
+    async function insertHistorySpot(carId, spot) {
+      await apiRequest("parking_history", {
+        method: "POST",
+        headers: {
+          Prefer: "return=minimal"
+        },
+        body: JSON.stringify([
+          {
+            car_id: carId,
+            spot,
+            saved_at: spot.savedAt
+          }
+        ])
       });
     }
 
-    function renderSavedSpot() {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) {
+    async function upsertCurrentSpot(carId, spot) {
+      await apiRequest("cars?on_conflict=id", {
+        method: "POST",
+        headers: {
+          Prefer: "resolution=merge-duplicates,return=representation"
+        },
+        body: JSON.stringify([
+          {
+            id: carId,
+            current_spot: spot,
+            updated_at: new Date().toISOString()
+          }
+        ])
+      });
+    }
+
+    async function deleteRemoteState() {
+      const carId = getCarId();
+      const encodedCarId = encodeURIComponent(carId);
+      await Promise.all([
+        apiRequest(`parking_history?car_id=eq.${encodedCarId}`, { method: "DELETE" }),
+        apiRequest(`cars?id=eq.${encodedCarId}`, { method: "DELETE" })
+      ]);
+    }
+
+    function renderHistory(history) {
+      historyList.innerHTML = "";
+      if (!history.length) {
+        const empty = document.createElement("p");
+        empty.className = "empty";
+        empty.textContent = "No previous locations yet.";
+        historyList.appendChild(empty);
+        return;
+      }
+
+      history.forEach((spot, index) => {
+        const item = document.createElement("div");
+        item.className = "history-item";
+
+        const left = document.createElement("div");
+        const title = document.createElement("div");
+        title.textContent = formatHistoryTitle(spot);
+        left.appendChild(title);
+
+        const details = [];
+        if (spot.details?.zone) {
+          details.push(`Zone ${spot.details.zone}`);
+        }
+        if (spot.details?.note) {
+          details.push(spot.details.note);
+        }
+        details.push(formatSavedDate(spot.savedAt));
+
+        const meta = document.createElement("div");
+        meta.className = "history-meta";
+        meta.textContent = details.join(" | ");
+        left.appendChild(meta);
+
+        const useButton = document.createElement("button");
+        useButton.type = "button";
+        useButton.className = "history-btn";
+        useButton.dataset.index = String(index);
+        useButton.textContent = "Use this";
+
+        item.appendChild(left);
+        item.appendChild(useButton);
+        historyList.appendChild(item);
+      });
+    }
+
+    function renderCurrentSpot(current) {
+      if (!current) {
         setTypeStatus(null);
         setSelectedLevel("");
-        gpsStatus.textContent = "No GPS captured yet.";
+        gpsStatus.textContent = hasBackendConfig() ? "No shared GPS saved yet." : "Shared backend is not configured.";
+        distanceStatus.textContent = "Distance to car unavailable.";
+        zoneInput.value = "";
+        spotInput.value = "";
         setMapLinks(null);
+        setMiniMap(null);
+        setLocateEnabled(false);
         lastSpot.className = "empty";
         lastSpot.textContent = "No parking spot saved yet.";
         return;
       }
 
-      try {
-        const data = JSON.parse(raw);
-        const when = new Date(data.savedAt).toLocaleString();
-        const gpsText = `${data.gps.lat.toFixed(6)}, ${data.gps.lng.toFixed(6)} (±${Math.round(data.gps.accuracy)}m)`;
+      const when = formatSavedDate(current.savedAt);
+      const gpsText = `${current.gps.lat.toFixed(6)}, ${current.gps.lng.toFixed(6)} (±${Math.round(current.gps.accuracy || 0)}m)`;
+      const details = current.details || {};
 
-        setTypeStatus(data.type);
-        setSelectedLevel(data.type === "lot" ? data.level : "");
-        gpsStatus.textContent = `GPS: ${gpsText}`;
-        setMapLinks(data.gps);
+      setTypeStatus(current.type);
+      setSelectedLevel(current.type === "lot" ? current.level : "");
+      gpsStatus.textContent = `Shared GPS: ${gpsText}`;
+      distanceStatus.textContent = "Tap Locate My Car to get your current distance.";
+      zoneInput.value = details.zone || "";
+      spotInput.value = details.note || "";
+      setMapLinks(current.gps);
+      setMiniMap(current.gps);
+      setLocateEnabled(true);
 
-        lastSpot.className = "";
-        if (data.type === "lot") {
-          lastSpot.innerHTML = `<p><strong>Type:</strong> Parking Lot</p><p><strong>Level:</strong> ${data.level}</p><p><strong>GPS:</strong> ${gpsText}</p><p><strong>Saved:</strong> ${when}</p>`;
-        } else {
-          lastSpot.innerHTML = `<p><strong>Type:</strong> Street</p><p><strong>GPS:</strong> ${gpsText}</p><p><strong>Saved:</strong> ${when}</p>`;
-        }
-      } catch (_) {
-        setTypeStatus(null);
-        setSelectedLevel("");
-        setMapLinks(null);
-        gpsStatus.textContent = "Saved data is invalid. Please save again.";
-        lastSpot.className = "empty";
-        lastSpot.textContent = "Saved data is invalid. Please save again.";
+      lastSpot.className = "";
+      if (current.type === "lot") {
+        lastSpot.innerHTML = `<p><strong>Type:</strong> Parking Lot</p><p><strong>Level:</strong> ${escapeHtml(current.level || "Unknown")}</p>${describeSpotDetails(details)}<p><strong>GPS:</strong> ${gpsText}</p><p><strong>Saved:</strong> ${when}</p>`;
+      } else {
+        lastSpot.innerHTML = `<p><strong>Type:</strong> Street</p>${describeSpotDetails(details)}<p><strong>GPS:</strong> ${gpsText}</p><p><strong>Saved:</strong> ${when}</p>`;
       }
     }
 
-    function captureGps() {
+    function renderConnectionState() {
+      if (!hasBackendConfig()) {
+        syncStatus.textContent = "Shared backend is not configured.";
+      }
+    }
+
+    function renderAll() {
+      renderConnectionState();
+      renderCurrentSpot(appState.current);
+      renderHistory(appState.history);
+    }
+
+    async function syncFromBackend(reason = "sync") {
+      if (!hasBackendConfig() || appState.isSyncing) {
+        return;
+      }
+
+      appState.isSyncing = true;
+      if (reason === "manual") {
+        syncStatus.textContent = `Refreshing shared car ${getCarId()}...`;
+      }
+
+      try {
+        const remote = await fetchRemoteState();
+        appState.current = remote.current;
+        appState.history = remote.history;
+        syncStatus.textContent = `Shared car ${getCarId()} synced at ${new Date().toLocaleTimeString()}.`;
+        renderAll();
+      } catch (error) {
+        syncStatus.textContent = `Sync failed: ${error.message}`;
+      } finally {
+        appState.isSyncing = false;
+      }
+    }
+
+    function captureGps(options = {}) {
       return new Promise((resolve, reject) => {
         if (!navigator.geolocation) {
           reject(new Error("GPS is not supported on this device/browser."));
@@ -330,28 +864,44 @@
           },
           (error) => reject(new Error(error.message)),
           {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
+            enableHighAccuracy: options.enableHighAccuracy ?? true,
+            timeout: options.timeout ?? 10000,
+            maximumAge: options.maximumAge ?? 0
           }
         );
       });
+    }
+
+    async function saveSpot(spot) {
+      if (!hasBackendConfig()) {
+        gpsStatus.textContent = "Shared backend is not configured.";
+        return;
+      }
+
+      const carId = getCarId();
+      try {
+        const previous = appState.current;
+        if (previous) {
+          await insertHistorySpot(carId, previous);
+        }
+        await upsertCurrentSpot(carId, spot);
+        await syncFromBackend();
+      } catch (error) {
+        gpsStatus.textContent = `Save failed: ${error.message}`;
+      }
     }
 
     async function saveLot(level) {
       gpsStatus.textContent = "Capturing GPS for parking lot...";
       try {
         const gps = await captureGps();
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify({
-            type: "lot",
-            level,
-            gps,
-            savedAt: new Date().toISOString()
-          })
-        );
-        renderSavedSpot();
+        await saveSpot({
+          type: "lot",
+          level,
+          details: getSpotDetails(),
+          gps,
+          savedAt: new Date().toISOString()
+        });
       } catch (error) {
         gpsStatus.textContent = `GPS failed: ${error.message}`;
       }
@@ -361,17 +911,75 @@
       gpsStatus.textContent = "Capturing GPS for street...";
       try {
         const gps = await captureGps();
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify({
-            type: "street",
-            gps,
-            savedAt: new Date().toISOString()
-          })
-        );
-        renderSavedSpot();
+        await saveSpot({
+          type: "street",
+          details: getSpotDetails(),
+          gps,
+          savedAt: new Date().toISOString()
+        });
       } catch (error) {
         gpsStatus.textContent = `GPS failed: ${error.message}`;
+      }
+    }
+
+    async function restoreFromHistory(index) {
+      const selected = appState.history[index];
+      if (!selected) {
+        return;
+      }
+      distanceStatus.textContent = "Restoring previous parking location...";
+      await saveSpot({
+        ...selected,
+        savedAt: new Date().toISOString()
+      });
+      distanceStatus.textContent = "Loaded a previous parking location.";
+    }
+
+    async function locateCar() {
+      const current = appState.current;
+      if (!current || !isValidGps(current.gps)) {
+        distanceStatus.textContent = "No saved car location found.";
+        return;
+      }
+
+      distanceStatus.textContent = "Getting your current location...";
+      try {
+        const currentGps = await captureGps({ enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 });
+        const meters = calculateDistanceMeters(
+          { lat: currentGps.lat, lng: currentGps.lng },
+          { lat: current.gps.lat, lng: current.gps.lng }
+        );
+        distanceStatus.textContent = `You are about ${formatDistance(meters)} from the shared car.`;
+      } catch (error) {
+        distanceStatus.textContent = `Could not get current location: ${error.message}`;
+      }
+    }
+
+    function openCar() {
+      const nextCarId = carIdInput.value.trim().replace(/\s+/g, "-").toLowerCase();
+      if (!nextCarId) {
+        shareNote.textContent = "Enter a car ID first.";
+        return;
+      }
+      setCarId(nextCarId);
+      appState.current = null;
+      appState.history = [];
+      renderAll();
+      syncFromBackend("manual");
+    }
+
+    async function clearSharedCar() {
+      if (!hasBackendConfig()) {
+        return;
+      }
+      try {
+        await deleteRemoteState();
+        appState.current = null;
+        appState.history = [];
+        renderAll();
+        syncStatus.textContent = `Cleared shared car ${getCarId()}.`;
+      } catch (error) {
+        syncStatus.textContent = `Clear failed: ${error.message}`;
       }
     }
 
@@ -382,13 +990,35 @@
     });
 
     captureGpsBtn.addEventListener("click", saveStreet);
-
-    clearBtn.addEventListener("click", () => {
-      localStorage.removeItem(STORAGE_KEY);
-      renderSavedSpot();
+    locateBtn.addEventListener("click", locateCar);
+    clearBtn.addEventListener("click", clearSharedCar);
+    openCarBtn.addEventListener("click", openCar);
+    copyShareBtn.addEventListener("click", copyShareLink);
+    historyList.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement) || !target.classList.contains("history-btn")) {
+        return;
+      }
+      const index = Number(target.dataset.index);
+      if (Number.isNaN(index)) {
+        return;
+      }
+      restoreFromHistory(index);
     });
 
-    renderSavedSpot();
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        syncFromBackend();
+      }
+    });
+
+    appState.config = BACKEND_CONFIG;
+    ensureCarId();
+    renderAll();
+    syncFromBackend("manual");
+    window.setInterval(() => {
+      syncFromBackend();
+    }, SYNC_INTERVAL_MS);
   </script>
 </body>
 </html>
