@@ -1,86 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="Lag_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 1024 1024">
-  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Car Locator Saab badge</title>
+  <desc id="desc">A clean Saab-inspired round badge on a light blue rounded app icon background.</desc>
+
   <defs>
-    <style>
-      .st0 {
-        fill: url(#Ikke-navngivet_forløb);
-      }
-
-      .st1 {
-        fill: #1e8e4d;
-      }
-
-      .st2, .st3 {
-        stroke: #d28d17;
-      }
-
-      .st2, .st3, .st4 {
-        stroke-width: 34px;
-      }
-
-      .st2, .st3, .st4, .st5, .st6 {
-        fill: none;
-        stroke-linecap: round;
-      }
-
-      .st2, .st5 {
-        stroke-linejoin: round;
-      }
-
-      .st4 {
-        stroke: #cfb688;
-      }
-
-      .st5 {
-        stroke: #fff;
-        stroke-width: 16px;
-      }
-
-      .st6 {
-        stroke: #d8c29a;
-        stroke-width: 24px;
-      }
-
-      .st7 {
-        fill: url(#Ikke-navngivet_forløb_3);
-      }
-
-      .st8 {
-        fill: url(#Ikke-navngivet_forløb_2);
-      }
-
-      .st9 {
-        filter: url(#shadow);
-      }
-    </style>
-    <linearGradient id="Ikke-navngivet_forløb" data-name="Ikke-navngivet forløb" x1="117.26" y1="933.42" x2="917.26" y2="83.42" gradientTransform="translate(0 1026) scale(1 -1)" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#f5e7c9"/>
-      <stop offset="1" stop-color="#e4cfa2"/>
+    <linearGradient id="bg" x1="160" y1="120" x2="864" y2="904" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#eef7ff"/>
+      <stop offset="1" stop-color="#bedcff"/>
     </linearGradient>
-    <filter id="shadow" x="200" y="180" width="624" height="690">
-      <feOffset dy="18"/>
-      <feGaussianBlur stdDeviation="18"/>
-      <feColorMatrix values="0 0 0 0 0.17 0 0 0 0 0.12 0 0 0 0 0.06 0 0 0 0.28 0"/>
-    </filter>
-    <linearGradient id="Ikke-navngivet_forløb_2" data-name="Ikke-navngivet forløb 2" x1="413.11" y1="762.38" x2="613.11" y2="382.38" gradientTransform="translate(0 1026) scale(1 -1)" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#137765"/>
-      <stop offset="1" stop-color="#0c5b4d"/>
-    </linearGradient>
-    <linearGradient id="Ikke-navngivet_forløb_3" data-name="Ikke-navngivet forløb 3" x1="388.53" y1="713.29" x2="668.53" y2="413.29" gradientTransform="translate(0 1026) scale(1 -1)" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#fff"/>
-      <stop offset="1" stop-color="#f6f1e5"/>
+    <radialGradient id="badgeBlue" cx="50%" cy="42%" r="58%">
+      <stop offset="0" stop-color="#214d7a"/>
+      <stop offset="1" stop-color="#10304d"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="300" y1="250" x2="724" y2="774" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#b8c8d7"/>
     </linearGradient>
   </defs>
-  <rect class="st0" x="32" y="32" width="960" height="960" rx="220" ry="220"/>
-  <path class="st4" d="M210,790c120,110,484,110,604,0"/>
-  <path class="st6" d="M250,858c118,82,406,82,524,0"/>
-  <g class="st9">
-    <path class="st8" d="M512,246c-112,0-203,89-203,200,0,144,155,283,190,314,8,7,18,7,26,0,35-31,190-170,190-314,0-111-91-200-203-200Z"/>
+
+  <rect x="32" y="32" width="960" height="960" rx="236" ry="236" fill="url(#bg)"/>
+
+  <circle cx="512" cy="512" r="226" fill="url(#ring)"/>
+  <circle cx="512" cy="512" r="198" fill="url(#badgeBlue)"/>
+  <ellipse cx="512" cy="452" rx="170" ry="134" fill="#2b5784" opacity=".72"/>
+  <circle cx="512" cy="512" r="182" fill="none" stroke="#3d6388" stroke-width="6" opacity=".45"/>
+
+  <text x="512" y="382" text-anchor="middle" font-family="Avenir Next, Helvetica, Arial, sans-serif" font-size="82" font-weight="700" letter-spacing="12" fill="#f4f8fc">SAAB</text>
+
+  <g transform="translate(512 578)">
+    <path d="M-82 42-56-4-6-32 54-30 102-4 126 36 128 80 114 126 80 170 36 194-12 198-8 158 24 148 54 128 78 98 88 58 80 28 58 10 26 4-10 12-38 30-58 60Z" fill="#d92f34"/>
+    <path d="M-108 58-82 16-56 32-66 58-52 88-74 116-108 126-130 96-124 72Z" fill="#d92f34"/>
+    <path d="M26 12 54-16 96-24 128-10 142 12 134 34 112 48 84 52 54 48 30 36Z" fill="#d92f34"/>
+    <path d="M80-72 106-112 132-72 162-78 154-48 182-30 154-12 162 18 132 12 110 50 88 12 56 18 66-12 38-30 66-48Z" fill="#f0c44c"/>
+    <circle cx="132" cy="-72" r="9" fill="#f7de8f"/>
   </g>
-  <circle class="st7" cx="512" cy="445" r="126"/>
-  <path class="st3" d="M454,366v158"/>
-  <path class="st2" d="M454,366h79c40,0,72,32,72,72s-32,72-72,72h-79"/>
-  <circle class="st1" cx="786" cy="246" r="64"/>
-  <path class="st5" d="M758,246l22,22,38-40"/>
 </svg>
