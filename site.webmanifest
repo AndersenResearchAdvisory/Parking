@@ -1,6 +1,6 @@
 {
-  "name": "Where Did I Park",
-  "short_name": "Where I Park",
+  "name": "Car Locator",
+  "short_name": "Car Locator",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
