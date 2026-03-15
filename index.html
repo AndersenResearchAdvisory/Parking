@@ -357,19 +357,6 @@
     <h1>Car Locator</h1>
     <p class="sub">Share the same car link with other people, then save lot or street parking together.</p>
 
-    <section class="share-card">
-      <div class="share-grid">
-        <div>
-          <label class="field-label" for="carIdInput">Shared car ID</label>
-          <input id="carIdInput" class="field-input" type="text" maxlength="48" placeholder="shared car id">
-        </div>
-        <button id="openCarBtn" class="main-btn secondary-btn" type="button">Open Car</button>
-        <button id="copyShareBtn" class="main-btn secondary-btn" type="button">Copy Link</button>
-      </div>
-      <p id="shareNote" class="share-note">This link identifies the shared car.</p>
-      <p id="syncStatus" class="sync-status">Shared backend is ready.</p>
-    </section>
-
     <div class="status-row" aria-label="Parking type status">
       <div id="lotStatus" class="status-pill">Parking Lot</div>
       <div id="streetStatus" class="status-pill">Street</div>
@@ -420,6 +407,19 @@
       <div id="historyList" class="history-list">
         <p class="empty">No previous locations yet.</p>
       </div>
+    </section>
+
+    <section class="share-card">
+      <div class="share-grid">
+        <div>
+          <label class="field-label" for="carIdInput">Shared car ID</label>
+          <input id="carIdInput" class="field-input" type="text" maxlength="48" placeholder="shared car id">
+        </div>
+        <button id="openCarBtn" class="main-btn secondary-btn" type="button">Open Car</button>
+        <button id="copyShareBtn" class="main-btn secondary-btn" type="button">Copy Link</button>
+      </div>
+      <p id="shareNote" class="share-note">This link identifies the shared car.</p>
+      <p id="syncStatus" class="sync-status">Shared backend is ready.</p>
     </section>
   </main>
 
