@@ -89,6 +89,11 @@
       border-color: #a8d9b8;
     }
 
+    .status-pill.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
     .status-pill:focus-visible {
       outline: 3px solid rgba(13, 107, 91, 0.22);
       outline-offset: 2px;
@@ -392,7 +397,7 @@
     </section>
 
     <div class="actions">
-      <button id="captureGpsBtn" class="main-btn" type="button">Save Street via GPS</button>
+      <button id="captureGpsBtn" class="main-btn" type="button">Parked on street</button>
       <button id="locateBtn" class="main-btn" type="button">Locate My Car</button>
       <button id="clearBtn" class="clear-btn" type="button">Clear</button>
     </div>
@@ -552,15 +557,33 @@
       streetStatus.classList.toggle("active", type === "street");
     }
 
+    function getSelectedLevel() {
+      return Array.from(levelButtons).find((btn) => btn.classList.contains("active"))?.dataset.level || "";
+    }
+
+    function updateParkingLotAvailability() {
+      const hasLevel = Boolean(getSelectedLevel());
+      lotStatus.classList.toggle("disabled", !hasLevel);
+      lotStatus.setAttribute("aria-disabled", hasLevel ? "false" : "true");
+    }
+
     function setStreetButtonState(isSaved) {
-      captureGpsBtn.textContent = isSaved ? "Street Address Saved" : "Save Street via GPS";
       captureGpsBtn.classList.toggle("active-state", isSaved);
+    }
+
+    function setParkingActionLabel(type) {
+      if (type === "lot") {
+        captureGpsBtn.textContent = "Parked in parking Lot";
+      } else {
+        captureGpsBtn.textContent = "Parked on street";
+      }
     }
 
     function setSelectedLevel(level) {
       levelButtons.forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.level === level);
       });
+      updateParkingLotAvailability();
     }
 
     function setLocateEnabled(enabled) {
@@ -800,6 +823,7 @@
         setTypeStatus(null);
         setSelectedLevel("");
         setStreetButtonState(false);
+        setParkingActionLabel("street");
         gpsStatus.textContent = hasBackendConfig() ? "No shared GPS saved yet." : "Shared backend is not configured.";
         distanceStatus.textContent = "Distance to car unavailable.";
         zoneInput.value = "";
@@ -819,6 +843,7 @@
       setTypeStatus(current.type);
       setSelectedLevel(current.type === "lot" ? current.level : "");
       setStreetButtonState(current.type === "street");
+      setParkingActionLabel(current.type);
       gpsStatus.textContent = `Shared GPS: ${gpsText}`;
       distanceStatus.textContent = "Tap Locate My Car to get your current distance.";
       zoneInput.value = details.zone || "";
@@ -831,7 +856,7 @@
       if (current.type === "lot") {
         lastSpot.innerHTML = `<p><strong>Type:</strong> Parking Lot</p><p><strong>Level:</strong> ${escapeHtml(current.level || "Unknown")}</p>${describeSpotDetails(details)}<p><strong>GPS:</strong> ${gpsText}</p><p><strong>Saved:</strong> ${when}</p>`;
       } else {
-        lastSpot.innerHTML = `<p><strong>Type:</strong> Street</p>${describeSpotDetails(details)}<p><strong>GPS:</strong> ${gpsText}</p><p><strong>Saved:</strong> ${when}</p>`;
+        lastSpot.innerHTML = `<p><strong>Type:</strong> Street</p><p><strong>Level:</strong> Street</p>${describeSpotDetails(details)}<p><strong>GPS:</strong> ${gpsText}</p><p><strong>Saved:</strong> ${when}</p>`;
       }
     }
 
@@ -932,10 +957,15 @@
     }
 
     async function saveFixedParkingLot() {
+      const selectedLevel = getSelectedLevel();
+      if (!selectedLevel) {
+        gpsStatus.textContent = "Choose a parking lot level first.";
+        return;
+      }
       gpsStatus.textContent = "Saving fixed parking lot location...";
       await saveSpot({
         type: "lot",
-        level: Array.from(levelButtons).find((btn) => btn.classList.contains("active"))?.dataset.level || "Parking Lot",
+        level: selectedLevel,
         details: getSpotDetails(),
         gps: {
           ...FIXED_PARKING_LOT_GPS,
@@ -1037,9 +1067,13 @@
       });
     }
 
+    async function saveStreetFromStatus() {
+      await saveStreet();
+    }
+
     captureGpsBtn.addEventListener("click", saveStreet);
     addStatusTrigger(lotStatus, saveFixedParkingLot);
-    addStatusTrigger(streetStatus, saveStreet);
+    addStatusTrigger(streetStatus, saveStreetFromStatus);
     locateBtn.addEventListener("click", locateCar);
     clearBtn.addEventListener("click", clearSharedCar);
     openCarBtn.addEventListener("click", openCar);
@@ -1064,6 +1098,7 @@
 
     appState.config = BACKEND_CONFIG;
     ensureCarId();
+    updateParkingLotAvailability();
     renderAll();
     syncFromBackend("manual");
     window.setInterval(() => {
