@@ -443,8 +443,8 @@
     const MAX_HISTORY_ITEMS = 20;
     const SYNC_INTERVAL_MS = 15000;
     const FIXED_PARKING_LOT_GPS = {
-      lat: 55.684390235670506,
-      lng: 12.555727815087112,
+      lat: 55.68445070331317,
+      lng: 12.556425196927641,
       accuracy: 5,
       capturedAt: null
     };
@@ -941,19 +941,17 @@
     }
 
     async function saveLot(level) {
-      gpsStatus.textContent = "Capturing GPS for parking lot...";
-      try {
-        const gps = await captureGps();
-        await saveSpot({
-          type: "lot",
-          level,
-          details: getSpotDetails(),
-          gps,
-          savedAt: new Date().toISOString()
-        });
-      } catch (error) {
-        gpsStatus.textContent = `GPS failed: ${error.message}`;
-      }
+      gpsStatus.textContent = "Saving fixed parking lot location...";
+      await saveSpot({
+        type: "lot",
+        level,
+        details: getSpotDetails(),
+        gps: {
+          ...FIXED_PARKING_LOT_GPS,
+          capturedAt: new Date().toISOString()
+        },
+        savedAt: new Date().toISOString()
+      });
     }
 
     async function saveFixedParkingLot() {
@@ -962,17 +960,7 @@
         gpsStatus.textContent = "Choose a parking lot level first.";
         return;
       }
-      gpsStatus.textContent = "Saving fixed parking lot location...";
-      await saveSpot({
-        type: "lot",
-        level: selectedLevel,
-        details: getSpotDetails(),
-        gps: {
-          ...FIXED_PARKING_LOT_GPS,
-          capturedAt: new Date().toISOString()
-        },
-        savedAt: new Date().toISOString()
-      });
+      await saveLot(selectedLevel);
     }
 
     async function saveStreet() {
