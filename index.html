@@ -89,11 +89,6 @@
       border-color: #a8d9b8;
     }
 
-    .status-pill.disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
     .status-pill:focus-visible {
       outline: 3px solid rgba(13, 107, 91, 0.22);
       outline-offset: 2px;
@@ -561,12 +556,6 @@
       return Array.from(levelButtons).find((btn) => btn.classList.contains("active"))?.dataset.level || "";
     }
 
-    function updateParkingLotAvailability() {
-      const hasLevel = Boolean(getSelectedLevel());
-      lotStatus.classList.toggle("disabled", !hasLevel);
-      lotStatus.setAttribute("aria-disabled", hasLevel ? "false" : "true");
-    }
-
     function setStreetButtonState(isSaved) {
       captureGpsBtn.classList.toggle("active-state", isSaved);
     }
@@ -583,7 +572,6 @@
       levelButtons.forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.level === level);
       });
-      updateParkingLotAvailability();
     }
 
     function setLocateEnabled(enabled) {
@@ -1086,7 +1074,6 @@
 
     appState.config = BACKEND_CONFIG;
     ensureCarId();
-    updateParkingLotAvailability();
     renderAll();
     syncFromBackend("manual");
     window.setInterval(() => {
