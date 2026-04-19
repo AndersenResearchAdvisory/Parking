@@ -813,10 +813,13 @@
       }
     }
 
-    function clearLocalStore() {
-      localStorage.removeItem(STORAGE_KEY);
+    function clearCurrentSpot() {
+      if (appState.current) {
+        appState.history.unshift(appState.current);
+        appState.history = appState.history.slice(0, MAX_HISTORY_ITEMS);
+      }
       appState.current = null;
-      appState.history = [];
+      saveStore();
       renderAll();
     }
 
@@ -844,7 +847,7 @@
     addStatusTrigger(lotStatus, saveFixedParkingLot);
     addStatusTrigger(streetStatus, saveStreetFromStatus);
     locateBtn.addEventListener("click", locateCar);
-    clearBtn.addEventListener("click", clearLocalStore);
+    clearBtn.addEventListener("click", clearCurrentSpot);
     historyList.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof HTMLElement) || !target.classList.contains("history-btn")) {
