@@ -133,6 +133,12 @@
       color: #fff;
     }
 
+    .level-btn.pending {
+      background: #ead8b6;
+      border-color: #d9bf8f;
+      color: #5c4930;
+    }
+
     .actions {
       display: grid;
       grid-template-columns: 1fr 1fr auto;
@@ -498,6 +504,14 @@
     function setSelectedLevel(level) {
       levelButtons.forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.level === level);
+        btn.classList.remove("pending");
+      });
+    }
+
+    function setPendingLevelSelection() {
+      levelButtons.forEach((btn) => {
+        btn.classList.remove("active");
+        btn.classList.add("pending");
       });
     }
 
@@ -733,6 +747,10 @@
     function saveFixedParkingLot() {
       const selectedLevel = getSelectedLevel();
       if (!selectedLevel) {
+        setTypeStatus("lot");
+        setStreetButtonState(false);
+        setParkingActionLabel("lot");
+        setPendingLevelSelection();
         gpsStatus.textContent = "Choose a parking lot level first.";
         return;
       }
