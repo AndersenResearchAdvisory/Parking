@@ -322,7 +322,7 @@
 <body>
   <main class="app">
     <h1>Car Locator</h1>
-    <p class="sub">Save your latest parking spot and keep previous spots locally on this device.</p>
+    <p class="sub">Save the shared parking spot and keep the latest locations synced for everyone using the car.</p>
 
     <div class="status-row" aria-label="Parking type status">
       <div id="lotStatus" class="status-pill" role="button" tabindex="0" aria-label="Save parking lot location">Parking Lot</div>
@@ -332,7 +332,7 @@
     <section class="section">
       <span class="section-title">Parking lot level</span>
       <div class="level-buttons" role="group" aria-label="Select parking level">
-        <button class="level-btn" type="button" data-level="Level 1">Level 1</button>
+        <button class="level-btn" type="button" data-level="Ground Floor">Ground Floor</button>
         <button class="level-btn" type="button" data-level="Level 2">Level 2</button>
         <button class="level-btn" type="button" data-level="Level 3">Level 3</button>
         <button class="level-btn" type="button" data-level="Level 4">Level 4</button>
@@ -378,9 +378,29 @@
 
   </main>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import {
+      doc,
+      getDoc,
+      getFirestore,
+      onSnapshot,
+      runTransaction,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
     const STORAGE_KEY = "carLocatorLocalStore";
-    const MAX_HISTORY_ITEMS = 20;
+    const MAX_HISTORY_ITEMS = 3;
+    const SHARED_COLLECTION = "parkingState";
+    const SHARED_DOCUMENT = "sharedCar";
+    const firebaseConfig = {
+      apiKey: "AIzaSyCspO7NBY2UqxhnZQQyNOrtUgH8FK_og7k",
+      authDomain: "car-locator-fcb15.firebaseapp.com",
+      projectId: "car-locator-fcb15",
+      storageBucket: "car-locator-fcb15.firebasestorage.app",
+      messagingSenderId: "914811414493",
+      appId: "1:914811414493:web:721c80d4321ffce7117834"
+    };
     const FIXED_PARKING_LOT_GPS = {
       lat: 55.68445070331317,
       lng: 12.556425196927641,
@@ -409,6 +429,8 @@
       current: null,
       history: []
     };
+    let sharedDb = null;
+    let sharedDocRef = null;
 
     function isValidGps(gps) {
       return Boolean(gps && typeof gps.lat === "number" && typeof gps.lng === "number");
@@ -571,27 +593,148 @@
       };
     }
 
+    function emptyState() {
+      return {
+        current: null,
+        history: []
+      };
+    }
+
+    function createSpotSignature(spot) {
+      const normalized = normalizeSpot(spot);
+      if (!normalized) {
+        return "";
+      }
+
+      return JSON.stringify({
+        type: normalized.type,
+        level: normalized.level,
+        zone: normalized.details.zone,
+        note: normalized.details.note,
+        lat: normalized.gps.lat,
+        lng: normalized.gps.lng,
+        accuracy: normalized.gps.accuracy,
+        savedAt: normalized.savedAt
+      });
+    }
+
+    function trimAndDeduplicateHistory(history, current) {
+      const currentSignature = current ? createSpotSignature(current) : "";
+      const seen = new Set(currentSignature ? [currentSignature] : []);
+      const unique = [];
+
+      history.forEach((spot) => {
+        const normalized = normalizeSpot(spot);
+        if (!normalized) {
+          return;
+        }
+
+        const signature = createSpotSignature(normalized);
+        if (!signature || seen.has(signature)) {
+          return;
+        }
+
+        seen.add(signature);
+        unique.push(normalized);
+      });
+
+      return unique.slice(0, MAX_HISTORY_ITEMS);
+    }
+
+    function normalizeState(source) {
+      const current = normalizeSpot(source?.current);
+      const history = Array.isArray(source?.history) ? source.history : [];
+
+      return {
+        current,
+        history: trimAndDeduplicateHistory(history, current)
+      };
+    }
+
+    function hasSharedContent(state) {
+      return Boolean(state.current || state.history.length);
+    }
+
+    function serializeState(state) {
+      const normalizedState = normalizeState(state);
+      return {
+        current: normalizedState.current,
+        history: normalizedState.history.slice(0, MAX_HISTORY_ITEMS),
+        updatedAt: serverTimestamp()
+      };
+    }
+
+    function buildSavedState(previousState, nextSpot) {
+      const normalizedSpot = normalizeSpot(nextSpot);
+      if (!normalizedSpot) {
+        return normalizeState(previousState);
+      }
+
+      const nextHistory = [];
+      if (previousState.current) {
+        nextHistory.push(previousState.current);
+      }
+      nextHistory.push(...previousState.history);
+
+      return {
+        current: normalizedSpot,
+        history: trimAndDeduplicateHistory(nextHistory, normalizedSpot)
+      };
+    }
+
+    function buildRestoredState(previousState, index) {
+      const selected = previousState.history[index];
+      if (!selected) {
+        return normalizeState(previousState);
+      }
+
+      const remainingHistory = previousState.history.filter((_, historyIndex) => historyIndex !== index);
+      const nextCurrent = normalizeSpot({
+        ...selected,
+        savedAt: new Date().toISOString()
+      });
+      const nextHistory = [];
+
+      if (previousState.current) {
+        nextHistory.push(previousState.current);
+      }
+      nextHistory.push(...remainingHistory);
+
+      return {
+        current: nextCurrent,
+        history: trimAndDeduplicateHistory(nextHistory, nextCurrent)
+      };
+    }
+
+    function buildClearedState(previousState) {
+      const nextHistory = [];
+      if (previousState.current) {
+        nextHistory.push(previousState.current);
+      }
+      nextHistory.push(...previousState.history);
+
+      return {
+        current: null,
+        history: trimAndDeduplicateHistory(nextHistory, null)
+      };
+    }
+
     function loadStore() {
       try {
         const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-        return {
-          current: normalizeSpot(parsed.current),
-          history: Array.isArray(parsed.history) ? parsed.history.map(normalizeSpot).filter(Boolean) : []
-        };
+        return normalizeState(parsed);
       } catch (_) {
-        return {
-          current: null,
-          history: []
-        };
+        return emptyState();
       }
     }
 
     function saveStore() {
+      const normalizedState = normalizeState(appState);
       localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify({
-          current: appState.current,
-          history: appState.history.slice(0, MAX_HISTORY_ITEMS)
+          current: normalizedState.current,
+          history: normalizedState.history.slice(0, MAX_HISTORY_ITEMS)
         })
       );
     }
@@ -688,6 +831,12 @@
       renderHistory(appState.history);
     }
 
+    function applyState(nextState) {
+      appState = normalizeState(nextState);
+      saveStore();
+      renderAll();
+    }
+
     function captureGps(options = {}) {
       return new Promise((resolve, reject) => {
         if (!navigator.geolocation) {
@@ -714,25 +863,54 @@
       });
     }
 
-    function saveSpot(spot) {
+    async function persistSharedState(makeNextState, successMessage, failurePrefix) {
+      if (!sharedDb || !sharedDocRef) {
+        const fallbackState = makeNextState(normalizeState(appState));
+        applyState(fallbackState);
+        if (successMessage) {
+          gpsStatus.textContent = successMessage;
+        }
+        return;
+      }
+
+      try {
+        const nextState = await runTransaction(sharedDb, async (transaction) => {
+          const snapshot = await transaction.get(sharedDocRef);
+          const baseState = snapshot.exists() ? normalizeState(snapshot.data()) : emptyState();
+          const updatedState = normalizeState(makeNextState(baseState));
+          transaction.set(sharedDocRef, serializeState(updatedState));
+          return updatedState;
+        });
+
+        applyState(nextState);
+        if (successMessage) {
+          gpsStatus.textContent = successMessage;
+        }
+      } catch (error) {
+        console.error("Shared sync failed", error);
+        const fallbackState = makeNextState(normalizeState(appState));
+        applyState(fallbackState);
+        gpsStatus.textContent = `${failurePrefix}: ${error.message}`;
+      }
+    }
+
+    async function saveSpot(spot) {
       const nextSpot = normalizeSpot(spot);
       if (!nextSpot) {
         gpsStatus.textContent = "Parking spot is invalid.";
         return;
       }
 
-      if (appState.current) {
-        appState.history.unshift(appState.current);
-      }
-      appState.current = nextSpot;
-      appState.history = appState.history.slice(0, MAX_HISTORY_ITEMS);
-      saveStore();
-      renderAll();
+      await persistSharedState(
+        (previousState) => buildSavedState(previousState, nextSpot),
+        nextSpot.type === "lot" ? "Shared parking lot location saved." : "Shared street location saved.",
+        "Shared sync failed, saved locally instead"
+      );
     }
 
-    function saveLot(level) {
+    async function saveLot(level) {
       gpsStatus.textContent = "Saving fixed parking lot location...";
-      saveSpot({
+      await saveSpot({
         type: "lot",
         level,
         details: getSpotDetails(),
@@ -744,7 +922,7 @@
       });
     }
 
-    function saveFixedParkingLot() {
+    async function saveFixedParkingLot() {
       const selectedLevel = getSelectedLevel();
       if (!selectedLevel) {
         setTypeStatus("lot");
@@ -754,14 +932,14 @@
         gpsStatus.textContent = "Choose a parking lot level first.";
         return;
       }
-      saveLot(selectedLevel);
+      await saveLot(selectedLevel);
     }
 
     async function saveStreet() {
       gpsStatus.textContent = "Capturing GPS for street...";
       try {
         const gps = await captureGps();
-        saveSpot({
+        await saveSpot({
           type: "street",
           details: getSpotDetails(),
           gps,
@@ -772,24 +950,13 @@
       }
     }
 
-    function restoreFromHistory(index) {
-      const selected = appState.history[index];
-      if (!selected) {
-        return;
-      }
-
+    async function restoreFromHistory(index) {
       distanceStatus.textContent = "Restoring previous parking location...";
-      appState.history.splice(index, 1);
-      if (appState.current) {
-        appState.history.unshift(appState.current);
-      }
-      appState.current = normalizeSpot({
-        ...selected,
-        savedAt: new Date().toISOString()
-      });
-      appState.history = appState.history.slice(0, MAX_HISTORY_ITEMS);
-      saveStore();
-      renderAll();
+      await persistSharedState(
+        (previousState) => buildRestoredState(previousState, index),
+        "Loaded a previous parking location.",
+        "Could not restore shared parking history"
+      );
       distanceStatus.textContent = "Loaded a previous parking location.";
     }
 
@@ -813,19 +980,74 @@
       }
     }
 
-    function clearCurrentSpot() {
-      if (appState.current) {
-        appState.history.unshift(appState.current);
-        appState.history = appState.history.slice(0, MAX_HISTORY_ITEMS);
+    async function clearCurrentSpot() {
+      await persistSharedState(
+        (previousState) => buildClearedState(previousState),
+        "Current shared parking spot cleared.",
+        "Could not clear shared parking spot"
+      );
+    }
+
+    async function migrateLocalStoreIfNeeded() {
+      if (!sharedDb || !sharedDocRef) {
+        return;
       }
-      appState.current = null;
-      saveStore();
-      renderAll();
+
+      const localState = normalizeState(loadStore());
+      if (!hasSharedContent(localState)) {
+        return;
+      }
+
+      try {
+        const snapshot = await getDoc(sharedDocRef);
+        if (snapshot.exists() && hasSharedContent(normalizeState(snapshot.data()))) {
+          return;
+        }
+
+        await runTransaction(sharedDb, async (transaction) => {
+          const existingSnapshot = await transaction.get(sharedDocRef);
+          const existingState = existingSnapshot.exists() ? normalizeState(existingSnapshot.data()) : emptyState();
+          if (hasSharedContent(existingState)) {
+            return;
+          }
+          transaction.set(sharedDocRef, serializeState(localState));
+        });
+      } catch (error) {
+        console.error("Local migration to Firestore failed", error);
+      }
+    }
+
+    async function initializeSharedSync() {
+      try {
+        const firebaseApp = initializeApp(firebaseConfig);
+        sharedDb = getFirestore(firebaseApp);
+        sharedDocRef = doc(sharedDb, SHARED_COLLECTION, SHARED_DOCUMENT);
+        await migrateLocalStoreIfNeeded();
+
+        onSnapshot(
+          sharedDocRef,
+          (snapshot) => {
+            if (!snapshot.exists()) {
+              applyState(emptyState());
+              return;
+            }
+
+            applyState(snapshot.data());
+          },
+          (error) => {
+            console.error("Realtime sync unavailable", error);
+            gpsStatus.textContent = "Shared sync unavailable. Using local saved data on this device.";
+          }
+        );
+      } catch (error) {
+        console.error("Firebase setup failed", error);
+        gpsStatus.textContent = "Shared sync could not start. Using local saved data on this device.";
+      }
     }
 
     levelButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        saveLot(btn.dataset.level);
+      btn.addEventListener("click", async () => {
+        await saveLot(btn.dataset.level);
       });
     });
 
@@ -848,7 +1070,7 @@
     addStatusTrigger(streetStatus, saveStreetFromStatus);
     locateBtn.addEventListener("click", locateCar);
     clearBtn.addEventListener("click", clearCurrentSpot);
-    historyList.addEventListener("click", (event) => {
+    historyList.addEventListener("click", async (event) => {
       const target = event.target;
       if (!(target instanceof HTMLElement) || !target.classList.contains("history-btn")) {
         return;
@@ -857,11 +1079,12 @@
       if (Number.isNaN(index)) {
         return;
       }
-      restoreFromHistory(index);
+      await restoreFromHistory(index);
     });
 
     appState = loadStore();
     renderAll();
+    initializeSharedSync();
   </script>
 </body>
 </html>
